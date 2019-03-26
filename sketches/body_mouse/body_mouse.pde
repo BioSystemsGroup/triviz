@@ -56,9 +56,12 @@ void draw() {
       fill(0);
       if (showCycle) {
         textSize(20);
-        text("cycle = "+row, scrX/2, scrY-textOffset);
+        textAlign(LEFT);
+        text("cycle = ", scrX/2-75, scrY-textOffset);
+        textAlign(RIGHT);
+        text(row, scrX/2+75, scrY-textOffset);
         noFill();
-        rect(scrX/2-60, scrY-30, 125, 25);
+        rect(scrX/2-80, scrY-30, 160, 25);
       }
       
     }
