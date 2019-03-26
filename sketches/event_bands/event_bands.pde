@@ -1,9 +1,14 @@
 import java.util.Arrays;
 
-boolean snaps = true;
+boolean showCycle = false;
+boolean snaps = false;
 int column = 8;       // hard-coded to the Solute type
 int maxCycle = 10800; // hard-coded to tsa010.rv0x
 String event_type = "stressed"; // "nectrig" or "stressed"
+
+int scrX = 200, scrY = 250;
+int yOffset = 10;
+int textHeight = 10;
 
 Table[] files;
 StringList filenames;
@@ -18,7 +23,6 @@ float[] lastVals;
 float minY; float maxY;
 int bar_width = 20;
 int bar_offset = 15;
-int scrX = 200, scrY = 300;
 float max = -1;
 String columnTitle = "unset";
 float size_factor = 25.0;
@@ -57,8 +61,8 @@ void setup() {
   }
   
   columnTitle = files[referenceFileNumber].getColumnTitle(column);
-  minY = min(lengths.values())+20;
-  maxY = max(lengths.values())+40;
+  minY = min(lengths.values());
+  maxY = max(lengths.values())+2*yOffset;
   
   float filemax = -1;
   for (int fn=0 ; fn<files.length ; fn++ ) {
@@ -85,8 +89,9 @@ void draw() {
       stroke(0);
       fill(0); 
       fill(0);
-      text("cycle = "+cycle, 0, 10);
-      text(columnTitle, 0, 25);
+      if (showCycle) text("cycle = "+cycle, 0, 10);
+      textAlign(CENTER);
+      text(columnTitle, scrX/2, textHeight);
       begin(5*snap_interval);
       end(maxCycle-5*snap_interval);
     } // end if (cycle % snap_interval == 0) {
@@ -102,8 +107,6 @@ void draw() {
         row[fn]++;
       }
       if (cycle % snap_interval == 0) {
-        fill(0);
-        text("cycle = "+cycle, 0, 10);
         float x = fn*(bar_width+bar_offset);
         float cY = minY+maxY/2;
         float y = cY-(lengths.get(fn)/2);
@@ -112,7 +115,7 @@ void draw() {
         fill(redgreen, redgreen, blue);
         rect(x, y, bar_width, lengths.get(fn));
         fill(0);
-        //text(lowers.get(fn), x, cY);
+        textAlign(LEFT);
         text(hpcs.getString(fn,0), x, y-5);
         text("μ(vHPCs) = "+hpcs.getInt(fn,1), x, y+lengths.get(fn)+15);
         if (snaps) saveFrame("tsa010.rv0x-"+event_type+"-######.png");
