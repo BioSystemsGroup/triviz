@@ -1,10 +1,11 @@
 import java.util.Arrays;
 
-boolean showCycle = false;
-boolean snaps = false;
-int column = 8;       // hard-coded to the Solute type
-int maxCycle = 10800; // hard-coded to tsa010.rv0x
-String event_type = "stressed"; // "nectrig" or "stressed"
+boolean showCycle;
+boolean snaps;
+int maxCycle; // maximum cycles to snap
+String event_type; // "nectrig" or "stressed"
+
+int column = 8;       // hard-coded to the Cumulative result
 
 int scrX = 200, scrY = 250;
 int yOffset = 10;
@@ -34,66 +35,69 @@ void settings() {
 }
 
 void setup() {
-  String filename = sketchPath()+"/../../../data/tsa010.rv0x_hcount-bands.csv";
-  hpcs = loadTable(filename, "header");
-  filenames = new StringList();
-  for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
-    String interval = hpcs.getString(intervalNdx,0);
-    String[] s1 = split(interval, ',');
-    String[] s2 = split(s1[0], '[');
-    int lower = int(s2[1]);
-    lowers.append(lower);
-    String direction = s2[0];
-    String[] s3 = split(s1[1], ')');
-    int upper = int(s3[0]);
-    uppers.append(upper);
-    filenames.append("tsa010.rv0x_"+event_type+"-"+interval+".csv");
-  }
-  int longestFile = 0;
-  files = new Table[filenames.size()];
-  for (int fn=0 ; fn<filenames.size() ; fn++) {
-    files[fn] = loadTable("../../../data/"+filenames.get(fn), "header");
-    if (files[fn] != null && files[fn].getRowCount() > longestFile) {
-      referenceFileNumber = fn;
-      longestFile = files[fn].getRowCount();
+  if (parseArgs(args)) usage("Could not parse arguments.");
+  else {
+    String filename = sketchPath()+"/../../../data/tsa010.rv0x_hcount-bands.csv";
+    hpcs = loadTable(filename, "header");
+    filenames = new StringList();
+    for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
+      String interval = hpcs.getString(intervalNdx,0);
+      String[] s1 = split(interval, ',');
+      String[] s2 = split(s1[0], '[');
+      int lower = int(s2[1]);
+      lowers.append(lower);
+      String[] s3 = split(s1[1], ')');
+      int upper = int(s3[0]);
+      uppers.append(upper);
+      filenames.append("tsa010.rv0x_"+event_type+"-"+interval+".csv");
     }
-    lengths.append(hpcs.getInt(fn,1)/size_factor);
-  }
-  
-  columnTitle = files[referenceFileNumber].getColumnTitle(column);
-  minY = min(lengths.values());
-  maxY = max(lengths.values())+2*yOffset;
-  
-  float filemax = -1;
-  for (int fn=0 ; fn<files.length ; fn++ ) {
-    if (files[fn] == null) continue;
-    vals = new float[files[fn].getRowCount()];
-    for (int rndx=0 ; rndx<files[fn].getRowCount() ; rndx++ ) {
-      vals[rndx] = files[fn].getFloat(rndx, column);
+    int longestFile = 0;
+    files = new Table[filenames.size()];
+    for (int fn=0 ; fn<filenames.size() ; fn++) {
+      files[fn] = loadTable("../../../data/"+filenames.get(fn), "header");
+      if (files[fn] != null && files[fn].getRowCount() > longestFile) {
+        referenceFileNumber = fn;
+        longestFile = files[fn].getRowCount();
+      }
+      lengths.append(hpcs.getInt(fn,1)/size_factor);
     }
-    filemax = max(vals);
-  }
-  max = max(max,filemax);
-  lastVals = new float[files.length];
-  Arrays.fill(lastVals, 0);
-  row = new int[files.length];
-  Arrays.fill(row, 0);
+  
+    columnTitle = files[referenceFileNumber].getColumnTitle(column);
+    minY = min(lengths.values());
+    maxY = max(lengths.values())+2*yOffset;
+  
+    float filemax = -1;
+    for (int fn=0 ; fn<files.length ; fn++ ) {
+      if (files[fn] == null) continue;
+      vals = new float[files[fn].getRowCount()];
+      for (int rndx=0 ; rndx<files[fn].getRowCount() ; rndx++ ) {
+        vals[rndx] = files[fn].getFloat(rndx, column);
+      }
+      filemax = max(vals);
+    }
+    max = max(max,filemax);
+    lastVals = new float[files.length];
+    Arrays.fill(lastVals, 0);
+    row = new int[files.length];
+    Arrays.fill(row, 0);
+  } //if (parseArgs(args))
 }
 
 int cycle = 0;
 void draw() {
   if (cycle < maxCycle-1) {
-    //files[referenceFileNumber].getRowCount()-1) {
     if (cycle % snap_interval == 0) {
+      textAlign(CENTER);
       background(bg_intensity);
       stroke(0);
-      fill(0); 
+      if (showCycle) {
+        fill(0); 
+        text("cycle = "+cycle, scrX-50, scrY-3*textHeight);
+      }
       fill(0);
-      if (showCycle) text("cycle = "+cycle, 0, 10);
-      textAlign(CENTER);
       text(columnTitle, scrX/2, textHeight);
-      begin(5*snap_interval);
-      end(maxCycle-5*snap_interval);
+      begin(cycle, 5*snap_interval);
+      end(cycle, maxCycle-5*snap_interval);
     } // end if (cycle % snap_interval == 0) {
     float val = 0;
     for (int fn=0 ; fn<files.length ; fn++) {
@@ -122,18 +126,5 @@ void draw() {
       }
     } // end for (int fn=0 ; fn<files.length ; fn++) {
     cycle++;
-  }
+  } else exit();
 }
-
-void begin(int lower) {
-  if (cycle < lower) {
-    fill(255,0,0);
-    text("B", 190, 10);
-  }
-}
-void end(int upper) {
-  if (cycle > upper) {
-    fill(255,0,0);
-    text("E", 190, 10);
-  }
-}  
