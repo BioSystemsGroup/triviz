@@ -54,7 +54,6 @@ void draw() {
       fill(redgreen, redgreen, blue);
  shape(mouse, scrX/2-size_factor/2-xOffset, scrY/2-size_factor/2, size_factor, size_factor);
       fill(0);
-      if (snaps) saveFrame("tsa010.rv0x-"+columnTitle+"-######.png");
       
       fill(0);
       if (showCycle) {
@@ -66,7 +65,7 @@ void draw() {
         noFill();
         rect(scrX/2-80, scrY-30, 160, 25);
       }
-      
+      if (snaps) saveFrame("tsa010.rv0x-body-"+columnTitle+"-######.png");
     }
     row++;
   } else exit();

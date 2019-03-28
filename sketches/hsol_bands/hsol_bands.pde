@@ -95,7 +95,7 @@ void draw() {
         text(hpcs.getString(fn,0), x, y-textHeight/2);
         text("μ(vHPCs) = "+hpcs.getInt(fn,1), x, y+lengths.get(fn)+1.5*textHeight);
       }
-      if (snaps) saveFrame("tsa010.rv0x-"+columnTitle+"-######.png");
+      if (snaps) saveFrame("tsa010.rv0x-hsol-"+columnTitle+"-######.png");
     }
     row++;
   } else exit();
