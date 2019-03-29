@@ -1,6 +1,8 @@
 boolean showCycle;
 boolean snaps;
 int column;
+String data_dir;
+boolean useMA;
 
 int scrX = 200, scrY = 250;
 int yOffset = 10;
@@ -30,7 +32,7 @@ void settings() {
 void setup() {
   if (parseArgs(args)) usage("Could not parse arguments.");
   else {
-    String filename = sketchPath()+"/../../../data/tsa010.rv0x_hcount-bands.csv";
+    String filename = data_dir+"/tsa010.rv0x_hcount-bands.csv";
     hpcs = loadTable(filename, "header");
     StringList filenames = new StringList();
     for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
@@ -42,11 +44,11 @@ void setup() {
       String[] s3 = split(s1[1], ')');
       int upper = int(s3[0]);
       uppers.append(upper);
-      filenames.append("tsa010.rv0x_hsolute-avg-pHPC-pMC-"+interval+"-ma.csv");
+      filenames.append("tsa010.rv0x_hsolute-avg-pHPC-pMC-"+interval+(useMA ? "-ma" : "")+".csv");
     }
     files = new Table[filenames.size()];
     for (int fn=0 ; fn<filenames.size() ; fn++) {
-      files[fn] = loadTable("../../../data/"+filenames.get(fn), "header");
+      files[fn] = loadTable(data_dir+"/"+filenames.get(fn), "header");
       lengths.append(hpcs.getInt(fn,1)/size_factor);
     }
     if (column <= 0 || column >= files[referenceFileNumber].getColumnCount()) usage("Column "+column+" invalid.");
@@ -63,7 +65,7 @@ void setup() {
       filemax = max(vals);
     }
     max = max(max,filemax);
-  } // end if (args.length < 3) {
+  } // end if (parseArgs(args))
 }
 
 void draw() {
