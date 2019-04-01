@@ -9,7 +9,8 @@ boolean parseArgs(String[] a) {
   snaps = boolean(a[1]);
   maxCycle = int(a[2]);
   event_type = a[3];
-  println("Running with showCycle = "+showCycle+", snaps = "+snaps+", maxCycle = "+maxCycle+", event_type = "+event_type);  
+  data_dir = a[4];
+  println("Running with showCycle = "+showCycle+", snaps = "+snaps+", maxCycle = "+maxCycle+", event_type = "+event_type+", data_dir = "+data_dir);  
   if (!(event_type.equals("nectrig") || event_type.equals("stressed"))) return true;
   return false;
 }

@@ -4,6 +4,7 @@ boolean showCycle;
 boolean snaps;
 int maxCycle; // maximum cycles to snap
 String event_type; // "nectrig" or "stressed"
+String data_dir;
 
 int column = 8;       // hard-coded to the Cumulative result
 
@@ -37,7 +38,7 @@ void settings() {
 void setup() {
   if (parseArgs(args)) usage("Could not parse arguments.");
   else {
-    String filename = sketchPath()+"/../../../data/tsa010.rv0x_hcount-bands.csv";
+    String filename = data_dir+"/tsa010.rv0x_hcount-bands.csv";
     hpcs = loadTable(filename, "header");
     filenames = new StringList();
     for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
@@ -54,7 +55,7 @@ void setup() {
     int longestFile = 0;
     files = new Table[filenames.size()];
     for (int fn=0 ; fn<filenames.size() ; fn++) {
-      files[fn] = loadTable("../../../data/"+filenames.get(fn), "header");
+      files[fn] = loadTable(data_dir+"/"+filenames.get(fn), "header");
       if (files[fn] != null && files[fn].getRowCount() > longestFile) {
         referenceFileNumber = fn;
         longestFile = files[fn].getRowCount();

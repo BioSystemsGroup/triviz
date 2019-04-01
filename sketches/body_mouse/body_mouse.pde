@@ -3,6 +3,7 @@ PShape mouse;
 boolean showCycle;
 boolean snaps;
 int column;
+String data_dir;
 
 int scrX = 200, scrY = 250;
 int xOffset = 20;
@@ -26,7 +27,7 @@ void setup() {
   else {
     mouse = setupMouse();
     String body_fn = "tsa010.rv0x_body-avg.csv";
-    Table body_file = loadTable("../../../data/"+body_fn, "header");
+    Table body_file = loadTable(data_dir+"/"+body_fn, "header");
     if (column <= 0 || column >= body_file.getColumnCount()) usage("Column "+column+" invalid.");
     columnTitle = body_file.getColumnTitle(column);
     vals = new float[body_file.getRowCount()];

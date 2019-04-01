@@ -8,7 +8,8 @@ boolean parseArgs(String[] a) {
   showCycle = boolean(a[0]);
   snaps = boolean(a[1]);
   column = int(a[2]);
-  println("Running with showCycle = "+showCycle+", snaps = "+snaps+", column = "+column);
+  data_dir = a[3];
+  println("Running with showCycle = "+showCycle+", snaps = "+snaps+", column = "+column+", data_dir = "+data_dir);
   return false;
 }
 
