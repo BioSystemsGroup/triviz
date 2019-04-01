@@ -2,6 +2,15 @@
 DEBUG=0
 MA_WINDOW=181
 
+function usage() {
+   echo "  Usage: assemble.sh <experiment>"
+   exit 1
+}
+if [ $# -ne 1 ]; then usage; fi
+
+# get the experiment name from the args
+EXP=$1
+
 shopt -s extglob
 
 SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
@@ -23,22 +32,29 @@ ORIG_WD=${PWD}
 cd ${PARENT_DIR}/data
 
 # H counts
+${ISL_PATH}/bin/hcounts-inband.r dPV 3 7 ${EXP} > ${EXP}_hcount-bands.csv
+${ISL_PATH}/bin/hcounts-inband.r dPV 14 18 ${EXP} | tail -n 1 >> ${EXP}_hcount-bands.csv
+${ISL_PATH}/bin/hcounts-inband.r dCV 0 6 ${EXP} | tail -n 1 >> ${EXP}_hcount-bands.csv
+# remove the "[1] " R output.
+sed -i 's/\[1\] //g' ${EXP}_hcount-bands.csv
+# remove the space the every CSV reader except Processing handles
+sed -i 's/, /,/g' ${EXP}_hcount-bands.csv
 
 # Hsolute raw data
-${ISL_PATH}/bin/dataperH-inband.r dPV 3 7 tsa010.rv0x
-${ISL_PATH}/bin/dataperH-inband.r dPV 14 18 tsa010.rv0x
-${ISL_PATH}/bin/dataperH-inband.r dCV 0 6 tsa010.rv0x
+${ISL_PATH}/bin/dataperH-inband.r dPV 3 7 ${EXP}
+${ISL_PATH}/bin/dataperH-inband.r dPV 14 18 ${EXP}
+${ISL_PATH}/bin/dataperH-inband.r dCV 0 6 ${EXP}
 
 # Hsolute moving averages
-${SRC_DIR}/hsol_ma.r ${MA_WINDOW} tsa010.rv0x
+${SRC_DIR}/hsol_ma.r ${MA_WINDOW} ${EXP}
 
 # Event data
-${ISL_PATH}/bin/reduce-event-data-inband.r dPV 3 7 tsa010.rv0x
-${ISL_PATH}/bin/reduce-event-data-inband.r dPV 14 18 tsa010.rv0x
-${ISL_PATH}/bin/reduce-event-data-inband.r dCV 0 6 tsa010.rv0x
+${ISL_PATH}/bin/reduce-event-data-inband.r dPV 3 7 ${EXP}
+${ISL_PATH}/bin/reduce-event-data-inband.r dPV 14 18 ${EXP}
+${ISL_PATH}/bin/reduce-event-data-inband.r dCV 0 6 ${EXP}
 
 # Body data
-${ISL_PATH}/bin/coarse-compartment.r tsa010.rv0x
+${ISL_PATH}/bin/coarse-compartment.r ${EXP}
 
 cd ${ORIG_WD}
 
@@ -80,23 +96,23 @@ mkdir ${PNG_DIR}
 mv $(find ${ROOT_DIR}/sketches -name "*.png") ${PNG_DIR}/
 
 echo "Running the montages"
-for f in ${PNG_DIR}/tsa010.rv0x-body-APAP-??????.png
+for f in ${PNG_DIR}/${EXP}-body-APAP-??????.png
 do
   tail=${f#*body-APAP-}
   # tiling is column x row, unfortunately
-  #montage tsa010.rv0x-*-${tail} -tile 2x1 -geometry 200x300 -border 1 -bordercolor black -background black ${tail}
-  montage ${PNG_DIR}/tsa010.rv0x-body-APAP-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-APAP-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-ALT-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-body-ALT-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-N-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-GSH_Depletion-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-MitoDD-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-nMD-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-G-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-hsol-Repair-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-nectrig-${tail} \
-          ${PNG_DIR}/tsa010.rv0x-stressed-${tail} \
+  #montage ${EXP}-*-${tail} -tile 2x1 -geometry 200x300 -border 1 -bordercolor black -background black ${tail}
+  montage ${PNG_DIR}/${EXP}-body-APAP-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-APAP-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-ALT-${tail} \
+          ${PNG_DIR}/${EXP}-body-ALT-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-N-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-GSH_Depletion-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-MitoDD-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-nMD-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-G-${tail} \
+          ${PNG_DIR}/${EXP}-hsol-Repair-${tail} \
+          ${PNG_DIR}/${EXP}-nectrig-${tail} \
+          ${PNG_DIR}/${EXP}-stressed-${tail} \
           -tile 4x3 -geometry 200x250 -border 1 -background white ${PNG_DIR}/${tail}
           #-tile 4x3 -geometry 200x250 -border 1 -bordercolor black -background 'rbg(235,235,235)' booga.png
 done
@@ -104,5 +120,5 @@ done
 avconv -pattern_type glob -i "${PNG_DIR}/??????.png" -pix_fmt yuv420p output.mp4
 
 ## clean up
-# rm -rf ${PNG_DIR}
+rm -rf ${PNG_DIR}
 
