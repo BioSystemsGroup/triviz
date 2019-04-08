@@ -1,5 +1,6 @@
 boolean showCycle;
 boolean snaps;
+String exp;
 int column;
 String data_dir;
 boolean useMA;
@@ -32,7 +33,7 @@ void settings() {
 void setup() {
   if (parseArgs(args)) usage("Could not parse arguments.");
   else {
-    String filename = data_dir+"/tsa010.rv0x_hcount-bands.csv";
+    String filename = data_dir+"/"+exp+"_hcount-bands.csv";
     hpcs = loadTable(filename, "header");
     StringList filenames = new StringList();
     for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
@@ -44,7 +45,7 @@ void setup() {
       String[] s3 = split(s1[1], ')');
       int upper = int(s3[0]);
       uppers.append(upper);
-      filenames.append("tsa010.rv0x_hsolute-avg-pHPC-pMC-"+interval+(useMA ? "-ma" : "")+".csv");
+      filenames.append(exp+"_hsolute-avg-pHPC-pMC-"+interval+(useMA ? "-ma" : "")+".csv");
     }
     files = new Table[filenames.size()];
     for (int fn=0 ; fn<filenames.size() ; fn++) {
@@ -97,7 +98,7 @@ void draw() {
         text(hpcs.getString(fn,0), x, y-textHeight/2);
         text("μ(vHPCs) = "+hpcs.getInt(fn,1), x, y+lengths.get(fn)+1.5*textHeight);
       }
-      if (snaps) saveFrame("tsa010.rv0x-hsol-"+columnTitle+"-######.png");
+      if (snaps) saveFrame(exp+"-hsol-"+columnTitle+"-######.png");
     }
     row++;
   } else exit();

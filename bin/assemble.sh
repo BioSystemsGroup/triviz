@@ -55,41 +55,42 @@ ${ISL_PATH}/bin/reduce-event-data-inband.r dCV 0 6 ${EXP}
 
 # Body data
 ${ISL_PATH}/bin/coarse-compartment.r ${EXP}
+MAX_CYCLE=$(tail -n 1 ${EXP}_body-avg.csv | awk -F',' '{printf("%d\n",$1);}')
 
 cd ${ORIG_WD}
 
 # run hsol sketches
 # arguments <show cycle> <take snaps> <column> <use MA> <data directory>
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 1 false ${PARENT_DIR}/data # ALT
+                                            false true ${EXP} 1 false ${PARENT_DIR}/data # ALT
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 2 true ${PARENT_DIR}/data # APAP
+                                            false true ${EXP} 2 true ${PARENT_DIR}/data # APAP
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 3 true ${PARENT_DIR}/data # G
+                                            false true ${EXP} 3 true ${PARENT_DIR}/data # G
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 4 true ${PARENT_DIR}/data # GSH
+                                            false true ${EXP} 4 true ${PARENT_DIR}/data # GSH
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 6 true ${PARENT_DIR}/data # MitoDD
+                                            false true ${EXP} 6 true ${PARENT_DIR}/data # MitoDD
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 7 true ${PARENT_DIR}/data # N
+                                            false true ${EXP} 7 true ${PARENT_DIR}/data # N
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 8 true ${PARENT_DIR}/data # nMD
+                                            false true ${EXP} 8 true ${PARENT_DIR}/data # nMD
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/hsol_bands --run \
-                                            false true 10 true ${PARENT_DIR}/data # Repair
+                                            false true ${EXP} 10 true ${PARENT_DIR}/data # Repair
 
 # run event sketches
 # arguments <show cycle> <take snaps> <max cycle> <event type> <data directory>
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/event_bands --run \
-                                            false true 10800 nectrig ${PARENT_DIR}/data
+                                            false true ${EXP} ${MAX_CYCLE} nectrig ${PARENT_DIR}/data
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/event_bands --run \
-                                            false true 10800 stressed ${PARENT_DIR}/data
+                                            false true ${EXP} ${MAX_CYCLE} stressed ${PARENT_DIR}/data
 
 # run body sketches
 # arguments <show cycle> <take snaps> <column> <data directory>
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/body_mouse --run \
-                                            true true 1 ${PARENT_DIR}/data # APAP
+                                            true true ${EXP} 1 ${PARENT_DIR}/data # APAP
 /usr/local/processing-3.5.3/processing-java --sketch=/home/gepr/ucsf/triviz/triviz/sketches/body_mouse --run \
-                                            false true 6 ${PARENT_DIR}/data # ALT
+                                            false true ${EXP} 6 ${PARENT_DIR}/data # ALT
 
 rm -rf ${PNG_DIR}
 mkdir ${PNG_DIR}
@@ -120,5 +121,5 @@ done
 avconv -pattern_type glob -i "${PNG_DIR}/??????.png" -pix_fmt yuv420p output.mp4
 
 ## clean up
-rm -rf ${PNG_DIR}
+#rm -rf ${PNG_DIR}
 

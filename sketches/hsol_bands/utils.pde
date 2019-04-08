@@ -7,9 +7,10 @@ boolean parseArgs(String[] a) {
   if (a.length < 3) return true;
   showCycle = boolean(a[0]);
   snaps = boolean(a[1]);
-  column = int(a[2]);
-  useMA = boolean(a[3]);
-  data_dir = a[4];
+  exp = a[2];
+  column = int(a[3]);
+  useMA = boolean(a[4]);
+  data_dir = a[5];
   println("Running with showCycle = "+showCycle+", snaps = "+snaps+", column = "+column+", useMA = "+useMA+", data_dir = "+data_dir);
   return false;
 }

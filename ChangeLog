@@ -1,0 +1,6 @@
+2019-04-08-10:15  gepr  <gepr@tempusdictum.com>
+
+	* assemble.sh, *.pde: Add command-line arg specifying the experiment directory.
+	* event_data.pde: Use System.exit() to exit the VM when there are no data files to animate.
+	* assemble.sh (MAX_CYCLE): Extract maximum cycle from the body file for use as input into event sketch.
+

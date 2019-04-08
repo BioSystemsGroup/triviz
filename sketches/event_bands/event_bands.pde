@@ -2,6 +2,7 @@ import java.util.Arrays;
 
 boolean showCycle;
 boolean snaps;
+String exp;
 int maxCycle; // maximum cycles to snap
 String event_type; // "nectrig" or "stressed"
 String data_dir;
@@ -15,7 +16,7 @@ int textHeight = 10;
 Table[] files;
 StringList filenames;
 int[] row;
-int referenceFileNumber = 0;
+int referenceFileNumber = -1;
 Table hpcs;
 FloatList lengths = new FloatList();
 IntList lowers = new IntList();
@@ -38,7 +39,7 @@ void settings() {
 void setup() {
   if (parseArgs(args)) usage("Could not parse arguments.");
   else {
-    String filename = data_dir+"/tsa010.rv0x_hcount-bands.csv";
+    String filename = data_dir+"/"+exp+"_hcount-bands.csv";
     hpcs = loadTable(filename, "header");
     filenames = new StringList();
     for (int intervalNdx=0 ; intervalNdx<hpcs.getRowCount() ; intervalNdx++) {
@@ -50,7 +51,7 @@ void setup() {
       String[] s3 = split(s1[1], ')');
       int upper = int(s3[0]);
       uppers.append(upper);
-      filenames.append("tsa010.rv0x_"+event_type+"-"+interval+".csv");
+      filenames.append(exp+"_"+event_type+"-"+interval+".csv");
     }
     int longestFile = 0;
     files = new Table[filenames.size()];
@@ -62,7 +63,8 @@ void setup() {
       }
       lengths.append(hpcs.getInt(fn,1)/size_factor);
     }
-  
+    if (referenceFileNumber < 0) usage("No reference file was found.");
+
     columnTitle = files[referenceFileNumber].getColumnTitle(column);
     minY = min(lengths.values());
     maxY = max(lengths.values())+2*yOffset;
@@ -123,7 +125,7 @@ void draw() {
         textAlign(LEFT);
         text(hpcs.getString(fn,0), x, y-5);
         text("μ(vHPCs) = "+hpcs.getInt(fn,1), x, y+lengths.get(fn)+15);
-        if (snaps) saveFrame("tsa010.rv0x-"+event_type+"-######.png");
+        if (snaps) saveFrame(exp+"-"+event_type+"-######.png");
       }
     } // end for (int fn=0 ; fn<files.length ; fn++) {
     cycle++;

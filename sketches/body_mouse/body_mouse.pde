@@ -2,6 +2,7 @@ PShape mouse;
 
 boolean showCycle;
 boolean snaps;
+String exp;
 int column;
 String data_dir;
 
@@ -26,7 +27,7 @@ void setup() {
   if (parseArgs(args)) usage("Could not parse arguents.");
   else {
     mouse = setupMouse();
-    String body_fn = "tsa010.rv0x_body-avg.csv";
+    String body_fn = exp+"_body-avg.csv";
     Table body_file = loadTable(data_dir+"/"+body_fn, "header");
     if (column <= 0 || column >= body_file.getColumnCount()) usage("Column "+column+" invalid.");
     columnTitle = body_file.getColumnTitle(column);
@@ -66,7 +67,7 @@ void draw() {
         noFill();
         rect(scrX/2-80, scrY-30, 160, 25);
       }
-      if (snaps) saveFrame("tsa010.rv0x-body-"+columnTitle+"-######.png");
+      if (snaps) saveFrame(exp+"-body-"+columnTitle+"-######.png");
     }
     row++;
   } else exit();
